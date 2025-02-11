@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	background-color: #f4f4f4;
+	margin: 0;
+}
+
+.chat-container {
+	width: 350px;
+	background: white;
+	border-radius: 10px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+}
+
+.chat-header {
+	background: #007bff;
+	color: white;
+	padding: 10px;
+	text-align: center;
+	font-size: 18px;
+}
+
+.chat-body {
+	flex: 1;
+	padding: 10px;
+	overflow-y: auto;
+	max-height: 300px;
+}
+
+.chat-footer {
+	display: flex;
+	border-top: 1px solid #ccc;
+}
+
+.chat-footer input {
+	flex: 1;
+	padding: 10px;
+	border: none;
+	outline: none;
+}
+
+.chat-footer button {
+	padding: 10px;
+	background: #007bff;
+	color: white;
+	border: none;
+	cursor: pointer;
+}
+
+.message {
+	padding: 8px;
+	border-radius: 5px;
+	margin: 5px 0;
+}
+
+.user-message {
+	background: #eaeff5;
+	color: black;
+	text-align: right;
+}
+
+.bot-message {
+	background: white;
+}
+
+.menu-button {
+	background: #007bff;
+	color: white;
+	border: none;
+	padding: 10px;
+	margin: 5px;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	border-radius: 5px;
+}
+</style>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: black;
+	position: relative;
+	overflow: hidden;
+}
+
+.bg-video {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	z-index: -1;
+}
+
+.content {
+	position: relative;
+	z-index: 1;
+	background: rgba(0, 0, 0, 0.5);
+	padding: 20px;
+	border-radius: 10px;
+}
+</style>
+</head>
+<body>
+
+<video class="bg-video" autoplay muted loop>
+		<source
+			src="https://video-previews.elements.envatousercontent.com/06289631-c9c6-4e5a-aa04-6f87bdc23005/watermarked_preview/watermarked_preview.mp4"
+			type="video/mp4">
+		Your browser does not support the video tag.
+	</video>
+
+	<div class="chat-container">
+		<div class="chat-header">Chatbot</div>
+		<div class="chat-body" id="chatBody">
+			<div class="message bot-message">Hi there! You can ask me
+				questions or select an option from the menu below.</div>
+			<button class="menu-button" onclick="requestMobileNumber('My Details')">My Details</button>
+			<button class="menu-button" onclick="requestMobileNumber('Wallet Balance')">Wallet Balance</button>
+			<button class="menu-button" onclick="sendMenuMessage('Transaction Status')">Transaction Status</button>
+			<button class="menu-button" onclick="requestMobileNumber('Last five transactions')">Last Five Transactions</button>
+			<button class="menu-button" onclick="requestMobileNumber('Other')">Others</button>
+		</div>
+		<div class="chat-footer">
+			<input type="text" id="userInput" placeholder="Type a message...">
+			<button onclick="sendMessage()">Send</button>
+		</div>
+	</div>
+
+	<script>
+	let awaitingInputFor = null;  // Tracks which option is awaiting additional input
+
+	function sendMessage() {
+	    let userInput = document.getElementById("userInput");
+	    let userMessage = userInput.value.trim();
+	    if (userMessage === "") return;
+
+	    if (awaitingInputFor) {
+	        // If waiting for additional input, handle it accordingly
+	        if (awaitingInputFor === "Transaction Status") {
+	            processMessage(`Transaction Status for Transaction ID ${userMessage}`);
+	        } else {
+	            processMessage(`${awaitingInputFor} for mobile number ${userMessage}`);
+	        }
+	        awaitingInputFor = null;
+	    } else {
+	        processMessage(userMessage);
+	    }
+	    userInput.value = "";
+	}
+
+	// Function to handle menu selections
+	function sendMenuMessage(menuOption) {
+	    if (menuOption === "Transaction Status") {
+	        requestTransactionID(menuOption);
+	    } else {
+	        processMessage(menuOption);
+	    }
+	}
+
+	// Function to request a mobile number
+	function requestMobileNumber(menuOption) {
+	    let chatBody = document.getElementById("chatBody");
+	    
+	    let botMsgDiv = document.createElement("div");
+	    botMsgDiv.classList.add("message", "bot-message");
+	    botMsgDiv.textContent = `Please enter your mobile number to proceed with ${menuOption}.`;
+	    
+	    chatBody.appendChild(botMsgDiv);
+	    chatBody.scrollTop = chatBody.scrollHeight;
+
+	    awaitingInputFor = menuOption;
+	}
+
+	// Function to request a Transaction ID
+	function requestTransactionID(menuOption) {
+	    let chatBody = document.getElementById("chatBody");
+	    
+	    let botMsgDiv = document.createElement("div");
+	    botMsgDiv.classList.add("message", "bot-message");
+	    botMsgDiv.textContent = `Please enter the Transaction ID for ${menuOption}.`;
+	    
+	    chatBody.appendChild(botMsgDiv);
+	    chatBody.scrollTop = chatBody.scrollHeight;
+
+	    awaitingInputFor = menuOption;
+	}
+
+	// Function to send messages to the chatbot API
+	function processMessage(message) {
+	    let chatBody = document.getElementById("chatBody");
+	    
+	    let userMsgDiv = document.createElement("div");
+	    userMsgDiv.classList.add("message", "user-message");
+	    userMsgDiv.textContent = message;
+	    
+	    chatBody.appendChild(userMsgDiv);
+	    chatBody.scrollTop = chatBody.scrollHeight;
+
+	    // Send message to backend API
+	    fetch('http://localhost:8080/api/chatbot/message', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify({ message: message })
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        let botMsgDiv = document.createElement("div");
+	        botMsgDiv.classList.add("message", "bot-message");
+	        botMsgDiv.textContent = data.response || "Sorry, I didn't understand that.";
+	        
+	        chatBody.appendChild(botMsgDiv);
+	        chatBody.scrollTop = chatBody.scrollHeight;
+	    })
+	    .catch(error => {
+	        let botMsgDiv = document.createElement("div");
+	        botMsgDiv.classList.add("message", "bot-message");
+	        botMsgDiv.textContent = "Error connecting to chatbot API.";
+	        
+	        chatBody.appendChild(botMsgDiv);
+	        chatBody.scrollTop = chatBody.scrollHeight;
+	    });
+	}
+</script>
+</body>
+</html>

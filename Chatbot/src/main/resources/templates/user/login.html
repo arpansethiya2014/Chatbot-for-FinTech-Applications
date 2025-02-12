@@ -130,7 +130,7 @@ body {
 </head>
 <body>
 
-<video class="bg-video" autoplay muted loop>
+	<video class="bg-video" autoplay muted loop>
 		<source
 			src="https://video-previews.elements.envatousercontent.com/06289631-c9c6-4e5a-aa04-6f87bdc23005/watermarked_preview/watermarked_preview.mp4"
 			type="video/mp4">
@@ -142,10 +142,17 @@ body {
 		<div class="chat-body" id="chatBody">
 			<div class="message bot-message">Hi there! You can ask me
 				questions or select an option from the menu below.</div>
-			<button class="menu-button" onclick="requestMobileNumber('My Details')">My Details</button>
-			<button class="menu-button" onclick="requestMobileNumber('Wallet Balance')">Wallet Balance</button>
-			<button class="menu-button" onclick="sendMenuMessage('Transaction Status')">Transaction Status</button>
-			<button class="menu-button" onclick="requestMobileNumber('Last five transactions')">Last Five Transactions</button>
+			<button class="menu-button"
+				onclick="requestMobileNumber('My Details')">My Details</button>
+			<button class="menu-button"
+				onclick="requestMobileNumber('Wallet Balance')">Wallet
+				Balance</button>
+			<button class="menu-button"
+				onclick="sendMenuMessage('Transaction Status')">Transaction
+				Status</button>
+			<button class="menu-button"
+				onclick="requestMobileNumber('Last five transactions')">Last
+				Five Transactions</button>
 			<button class="menu-button" onclick="requestMobileNumber('Other')">Others</button>
 		</div>
 		<div class="chat-footer">
@@ -153,6 +160,14 @@ body {
 			<button onclick="sendMessage()">Send</button>
 		</div>
 	</div>
+
+	<script>
+document.getElementById("userInput").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+});
+</script>
 
 	<script>
 	let awaitingInputFor = null;  // Tracks which option is awaiting additional input

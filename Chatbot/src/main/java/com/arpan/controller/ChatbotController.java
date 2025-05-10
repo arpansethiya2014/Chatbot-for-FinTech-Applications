@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/chatbot")
@@ -80,7 +81,7 @@ public class ChatbotController {
 				return response;
 			}
 
-			List<UserWalletTransactions> lastFive = list.stream().limit(5).toList();
+			List<UserWalletTransactions> lastFive = list.stream().limit(5).collect(Collectors.toList());
 			StringBuilder responseStr = new StringBuilder();
 			for (UserWalletTransactions userWalletTransactions : lastFive) {
 				responseStr.append(userWalletTransactions.getWalletTxnDate()).append(" - ")
